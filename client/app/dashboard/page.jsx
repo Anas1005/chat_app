@@ -65,9 +65,9 @@ const GeneralApp = () => {
           )}
         </Box>
 
-        {sideBar.open &&
+        {sideBar?.open&&
           (() => {
-            switch (sideBar.type) {
+            switch (sideBar?.type) {
               case "CONTACT":
                 return <Contact />;
 

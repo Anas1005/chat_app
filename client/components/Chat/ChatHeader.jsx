@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import React from "react";
 import {
   Avatar,
@@ -14,7 +14,7 @@ import {
   Typography,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import { FaCaretDown, FaSearch, FaPhone, FaVideo } from 'react-icons/fa';
+import { FaCaretDown, FaSearch, FaPhone, FaVideo } from "react-icons/fa";
 // import { CaretDown, MagnifyingGlass, Phone, VideoCamera } from "phosphor-react";
 import { faker } from "@faker-js/faker";
 import useResponsive from "@/hooks/useResponsive";
@@ -72,17 +72,24 @@ const ChatHeader = () => {
   const isMobile = useResponsive("between", "md", "xs", "sm");
   const theme = useTheme();
 
-  const {current_conversation} = useSelector((state) => state.conversation.direct_chat);
+  const { current_conversation } = useSelector(
+    (state) => state.conversation.direct_chat
+  );
 
-//   const [conversationMenuAnchorEl, setConversationMenuAnchorEl] =
-//     React.useState(null);
-//   const openConversationMenu = Boolean(conversationMenuAnchorEl);
-//   const handleClickConversationMenu = (event) => {
-//     setConversationMenuAnchorEl(event.currentTarget);
-//   };
-//   const handleCloseConversationMenu = () => {
-//     setConversationMenuAnchorEl(null);
-//   };
+  const {onlineUsers} = useSelector((state) => state.app);
+  console.log("In Chat Header",onlineUsers)
+
+  let online = onlineUsers?.includes(current_conversation?.user_id);
+
+  //   const [conversationMenuAnchorEl, setConversationMenuAnchorEl] =
+  //     React.useState(null);
+  //   const openConversationMenu = Boolean(conversationMenuAnchorEl);
+  //   const handleClickConversationMenu = (event) => {
+  //     setConversationMenuAnchorEl(event.currentTarget);
+  //   };
+  //   const handleCloseConversationMenu = () => {
+  //     setConversationMenuAnchorEl(null);
+  //   };
 
   return (
     <>
@@ -110,7 +117,7 @@ const ChatHeader = () => {
             spacing={2}
             direction="row"
           >
-            <Box>
+            {/* <Box>
               <StyledBadge
                 overlap="circular"
                 anchorOrigin={{
@@ -124,12 +131,39 @@ const ChatHeader = () => {
                   src={current_conversation?.img}
                 />
               </StyledBadge>
+            </Box> */}
+
+            <Box>
+              {online ? (
+                <StyledBadge
+                  overlap="circular"
+                  anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                  variant="dot"
+                >
+                  <Avatar
+                    alt={current_conversation?.name}
+                    src={current_conversation?.img}
+                  />
+                </StyledBadge>
+              ) : (
+                <Avatar
+                  alt={current_conversation?.name}
+                  src={current_conversation?.img}
+                />
+              )}
             </Box>
+
             <Stack spacing={0.2}>
               <Typography variant="subtitle2">
-              {current_conversation?.name}
+                {current_conversation?.name}
               </Typography>
-              <Typography variant="caption">Online</Typography>
+
+              <Typography variant="caption">
+
+                {
+                  online ? "Online":"Offline"
+                }
+              </Typography>
             </Stack>
           </Stack>
           <Stack
@@ -137,7 +171,7 @@ const ChatHeader = () => {
             alignItems="center"
             spacing={isMobile ? 1 : 3}
           >
-            <IconButton 
+            <IconButton
             // onClick={() => {
             //   dispatch(StartVideoCall(current_conversation.user_id));
             // }}
@@ -146,7 +180,7 @@ const ChatHeader = () => {
             </IconButton>
             <IconButton
             //   onClick={() => {
-                
+
             //     dispatch(StartAudioCall(current_conversation.user_id));
             //   }}
             >
@@ -169,7 +203,7 @@ const ChatHeader = () => {
             //   aria-expanded={openConversationMenu ? "true" : undefined}
             //   onClick={handleClickConversationMenu}
             >
-              <FaCaretDown/>
+              <FaCaretDown />
             </IconButton>
             {/* <Menu
               MenuListProps={{
@@ -210,8 +244,6 @@ const ChatHeader = () => {
           </Stack>
         </Stack>
       </Box>
-
-      
     </>
   );
 };

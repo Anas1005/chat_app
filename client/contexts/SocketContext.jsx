@@ -4,6 +4,7 @@
 import React, { createContext, useContext, useEffect} from 'react';
 import { SetDirectConversations, UpdateDirectConversation, AddDirectConversation,SetCurrentMessages, AddDirectMessage,SetCurrentConversation} from '@/redux/slices/conversationSlice';
 import { SelectConversation } from '@/redux/slices/appSlice';
+import { SetOnlineUsers, UserOnline, UserOffline } from '@/redux/slices/appSlice';
 import { socket } from '@/socket';
 // import { io } from 'socket.io-client';
 import toast from 'react-hot-toast';
@@ -26,6 +27,24 @@ export const SocketContext = createContext();
 
 useEffect(() => {
     console.log("Socket In AppConetxt",socket)
+
+
+    socket?.on("get_online_users",(data)=>{
+      console.log("OnlineUsers Fetched",data.onlineUsers)
+      dispatch(SetOnlineUsers({onlineUsers:data.onlineUsers}))
+
+    })
+
+    socket?.on("user_online",(data)=>{
+      console.log("New OnlineUsee",data.user_id)
+      dispatch(UserOnline({user_id:data.user_id}))
+    })
+
+    socket?.on("user_offline",(data)=>{
+      console.log("New OfflineUser",data.user_id)
+      dispatch(UserOffline({user_id:data.user_id}))
+    })
+
 
     socket?.on("Checking",(data)=>{
         console.log(data);
@@ -95,13 +114,15 @@ useEffect(() => {
 
 
       return () => {
+        socket?.off("get_online_users");
+        socket?.off("user_online")
+        socket?.off("user_offline")
         socket?.off("request_sent");
         socket?.off("new_friend_request");
         socket?.off("request_accepted");
         socket?.off("start_chat");
         socket?.off("new_message");
         
-
       };
 
 

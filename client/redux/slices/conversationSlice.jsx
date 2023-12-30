@@ -34,7 +34,7 @@ const conversationSlice = createSlice({
               img:faker.image.avatar(),
               msg: el.messages.slice(-1)[0]?.text, 
               // msg:faker.music.songName(),
-              time: new Date(el.messages.slice(-1)[0].createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })  ,
+              time: new Date(el.messages.slice(-1)[0]?.createdAt)  ,
               unread: 0,
               pinned: false,
             //   about: user?.about,
@@ -62,7 +62,7 @@ const conversationSlice = createSlice({
               online: user?.status === "Online",
               img: faker.image.avatar(),
               msg: faker.music.songName(),
-              time: "9:36",
+              time: new Date(this_conversation.messages.slice(-1)[0]?.createdAt),
               unread: 0,
               pinned: false,
             };
@@ -87,8 +87,8 @@ const conversationSlice = createSlice({
         name: `${user?.firstName} ${user?.lastName}`,
         online: user?.status === "Online",
         img: faker.image.avatar(),
-        msg: faker.music.songName(),
-        time: "9:36",
+        msg: this_conversation.messages.slice(-1)[0]?.text,
+        time: new Date(this_conversation.messages.slice(-1)[0]?.createdAt),
         unread: 0,
         pinned: false,
       });

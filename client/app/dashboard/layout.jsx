@@ -20,10 +20,11 @@ export default function UsersLayout({
   {
     const {user_id} = useSelector((state) => state.auth);
     // const {socket, initializeSocket} = useContext(SocketContext);
-    const { room_id } = useSelector((state) => state.app);
+    const { room_id , onlineUsers} = useSelector((state) => state.app);
     const{isLoggedIn}=useSelector((state)=>state.auth);
     const {current_conversation, conversations} = useSelector((state)=>state.conversation.direct_chat);
     console.log("CurrenTConv",current_conversation);
+    console.log("OnelineUuuusers",onlineUsers);
     const [isSocketConnected, setIsSocketConnected] = useState(false);
     // console.log("ISSocket",isSocketConnected)
     console.log("Socket In Dash",socket)

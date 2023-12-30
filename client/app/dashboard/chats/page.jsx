@@ -48,7 +48,7 @@ const Chats = () => {
   console.log("Inside ChatList",conversations);
   const sortedConversations = [...conversations].sort((a, b) => {
     // Assuming 'time' is in the format HH:mm AM/PM
-    return new Date(`1970-01-01 ${b.time}`) - new Date(`1970-01-01 ${a.time}`);
+    return new Date(b.time) - new Date(a.time);
   });
 
   useEffect(() => {

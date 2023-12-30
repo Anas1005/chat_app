@@ -46,10 +46,13 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
   },
 }));
 
-const ChatElement = ({ id, img, name, msg, time, unread, pinned, online}) => {
+const ChatElement = ({ id,user_id, img, name, msg, time, unread, pinned}) => {
   const dispatch = useDispatch();
-  const {room_id} = useSelector((state) => state.app);
+  const {room_id, onlineUsers} = useSelector((state) => state.app);
+  console.log("In Chat Element",onlineUsers)
   const selectedChatId = room_id?.toString();
+
+  let online = onlineUsers?.includes(user_id);
 
   let isSelected = selectedChatId===id;
 
@@ -58,6 +61,44 @@ const ChatElement = ({ id, img, name, msg, time, unread, pinned, online}) => {
 //   }
 
   const theme = useTheme();
+
+  const formatDate = (createdAt) => {
+    const currentDate = new Date();
+    const messageDate = new Date(createdAt);
+  
+    // Check if the message was sent today
+    if (
+      messageDate.getDate() === currentDate.getDate() &&
+      messageDate.getMonth() === currentDate.getMonth() &&
+      messageDate.getFullYear() === currentDate.getFullYear()
+    ) {
+      // Format as HH:MM if sent today
+      return messageDate.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    } else {
+      // Check if the message was sent yesterday
+      const yesterday = new Date(currentDate);
+      yesterday.setDate(currentDate.getDate() - 1);
+  
+      if (
+        messageDate.getDate() === yesterday.getDate() &&
+        messageDate.getMonth() === yesterday.getMonth() &&
+        messageDate.getFullYear() === yesterday.getFullYear()
+      ) {
+        return "Yesterday";
+      } else {
+        // Format as DD/MM/YY if not today or yesterday
+        const day = messageDate.getDate().toString().padStart(2, "0");
+        const month = (messageDate.getMonth() + 1).toString().padStart(2, "0");
+        const year = messageDate.getFullYear().toString().slice(-2);
+  
+        return `${day}/${month}/${year}`;
+      }
+    }
+  };
+  
+  // Usage
+
+
 
   return (
     <StyledChatBox
@@ -104,7 +145,7 @@ const ChatElement = ({ id, img, name, msg, time, unread, pinned, online}) => {
         </Stack>
         <Stack spacing={2} alignItems={"center"}>
           <Typography sx={{ fontWeight: 600 }} variant="caption">
-            {time}
+            {formatDate(time)}
           </Typography>
           <Badge
             className="unread-count"

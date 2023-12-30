@@ -19,6 +19,7 @@ const initialState = {
   friendRequests: [], // all friend requests
   chat_type: null,
   room_id: null,
+  onlineUsers: [],
   // call_logs: [],
 
   tab: 0,
@@ -63,6 +64,20 @@ const appSlice = createSlice({
     selectConversation(state, action) {
       state.chat_type = "individual";
       state.room_id = action.payload.room_id;
+    },
+    setOnlineUsers: (state, action) => {
+      state.onlineUsers = action.payload.onlineUsers;
+    },
+    userOnline: (state, action) => {
+      console.log("In UserOnnline Reducer......")
+      state.onlineUsers.push(action.payload.user_id);
+    },
+    userOffline: (state, action) => {
+      console.log("In UserOffline Reducer......");
+      return {
+        ...state,
+        onlineUsers: state.onlineUsers.filter((userId) => userId !== action.payload.user_id),
+      };
     },
   },
 });
@@ -180,5 +195,25 @@ export function FetchFriendRequests() {
 export const SelectConversation = ({ room_id }) => {
   return async (dispatch, getState) => {
     dispatch(appSlice.actions.selectConversation({ room_id }));
+  };
+};
+
+export const SetOnlineUsers = ({ onlineUsers }) => {
+  return async (dispatch, getState) => {
+    dispatch(appSlice.actions.setOnlineUsers({ onlineUsers }));
+  };
+};
+
+export const UserOnline = ({ user_id }) => {
+  console.log("In UserOnnline Thunk......")
+  return async (dispatch, getState) => {
+    dispatch(appSlice.actions.userOnline({ user_id }));
+  };
+};
+
+export const UserOffline = ({ user_id }) => {
+  console.log("In UserOffline Thunk......")
+  return async (dispatch, getState) => {
+    dispatch(appSlice.actions.userOffline({ user_id }));
   };
 };
