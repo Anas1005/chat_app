@@ -1,0 +1,18 @@
+custom-scrollbar {
+    max-height: 100%;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #808080 #f0f0f0;  /* Adjust the colors as needed */
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: #808080;  /* Adjust the color as needed */
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background-color: #161C24;  /* Adjust the color as needed */
+  }
