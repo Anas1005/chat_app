@@ -33,14 +33,17 @@ const conversationSlice = createSlice({
             //   img: `https://${S3_BUCKET_NAME}.s3.${AWS_S3_REGION}.amazonaws.com/${user?.avatar}`,
               img:faker.image.avatar(),
               msg: el.messages.slice(-1)[0]?.text, 
-              // msg:faker.music.songName(),
               time: new Date(el.messages.slice(-1)[0]?.createdAt)  ,
               unread: 0,
               pinned: false,
+              outgoing:el.messages.slice(-1)[0]?.from===user_id,
+              status:el.messages.slice(-1)[0]?.status
             //   about: user?.about,
             };
           });
+          console.log("Before")
       state.direct_chat.conversations = conversations;
+      console.log("After")
     },
 
     updateDirectConversation(state, action) {
@@ -61,8 +64,10 @@ const conversationSlice = createSlice({
               name: `${user?.firstName} ${user?.lastName}`,
               online: user?.status === "Online",
               img: faker.image.avatar(),
-              msg: faker.music.songName(),
+              msg: this_conversation.messages.slice(-1)[0]?.text,
               time: new Date(this_conversation.messages.slice(-1)[0]?.createdAt),
+              outgoing:this_conversation.messages.slice(-1)[0]?.from===user_id,
+              status:this_conversation.messages.slice(-1)[0]?.status,
               unread: 0,
               pinned: false,
             };
@@ -89,6 +94,8 @@ const conversationSlice = createSlice({
         img: faker.image.avatar(),
         msg: this_conversation.messages.slice(-1)[0]?.text,
         time: new Date(this_conversation.messages.slice(-1)[0]?.createdAt),
+        outgoing:this_conversation.messages.slice(-1)[0]?.from===user_id,
+        status:this_conversation.messages.slice(-1)[0]?.status,
         unread: 0,
         pinned: false,
       });
@@ -109,6 +116,7 @@ const conversationSlice = createSlice({
         createdAt:el.createdAt,
         incoming: el.to === user_id,
         outgoing: el.from === user_id,
+        status:el.status
       }));
       state.direct_chat.current_messages = formatted_messages;
     },

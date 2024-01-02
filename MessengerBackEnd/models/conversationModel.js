@@ -35,6 +35,10 @@ const conversationSchema = new mongoose.Schema({
         type: Date,
         default: Date.now(),
       },
+      status: {
+        type: String,
+        enum: ["Sent", "Delivered","Seen"]
+      },
     },
   ],
 });

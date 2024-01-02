@@ -18,7 +18,7 @@ import { SetCurrentConversation, SetCurrentMessages } from "@/redux/slices/conve
 
 const Conversation = ({ isMobile }) => {
   const {user_id} = useSelector((state)=>state.auth);
-  const {getCurrentMessages} = useContext(SocketContext);
+  const {joinChatRoom,getCurrentMessages} = useContext(SocketContext);
   const dispatch = useDispatch();
 
   const { conversations, current_messages } = useSelector(
@@ -39,6 +39,7 @@ const Conversation = ({ isMobile }) => {
     // });
 
     // dispatch(SetCurrentConversation(current));
+    joinChatRoom();
     getCurrentMessages();
 
 

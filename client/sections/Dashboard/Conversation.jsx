@@ -9,13 +9,14 @@ import {
   Divider,
 } from "@mui/material";
 import { useTheme, alpha } from "@mui/material/styles";
-import { BsThreeDotsVertical, BsDownload, BsImage } from 'react-icons/bs';
+import { BsThreeDotsVertical, BsDownload, BsImage } from "react-icons/bs";
 // import { DotsThreeVertical, DownloadSimple, Image } from "phosphor-react";
 // import { text_options } from "@/data";
 // import { Link } from "react-router-dom";
 // import truncateString from "../../utils/truncate";
 // import { LinkPreview } from "@dhaiwat10/react-link-preview";
 import Embed from "react-embed";
+import { IoCheckmark, IoCheckmarkDoneOutline } from "react-icons/io5";
 
 // const textOption = () => {
 //   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -55,38 +56,81 @@ import Embed from "react-embed";
 //   );
 // };
 
-const TextMsg = ({ el}) => {
+const TextMsg = ({ el }) => {
   const theme = useTheme();
+  const iconStyle = {
+    fontSize: "1.5rem", // Adjust the size as needed
+    color: el.status === "Seen" ? "#04e813" : "#f2f3f2", // Adjust the colors as needed
+  };
 
   return (
-    <Stack direction="row" justifyContent={el.incoming ? 'start' : 'end'}>
+    <Stack direction="row" justifyContent={el.incoming ? "start" : "end"}>
       <Box
         px={1.5}
-        py={1.5}
+        pt={1.5}
         sx={{
           backgroundColor: el.incoming
             ? alpha(theme.palette.background.default, 1)
             : theme.palette.primary.main,
           borderRadius: 1.5,
-          width: 'max-content',
-          display: 'flex',
-          flexDirection: 'column',
+          width: "max-content",
+          display: "flex",
+          flexDirection: "row",
+          columnGap:"12px",
+          paddingBottom:el.outgoing?"4px":"8px"
+          // rowGap:"14"
           // alignItems: el.incoming ? 'flex-start' : 'flex-end',
         }}
       >
-        <Typography variant="body2" color={el.incoming ? theme.palette.text : '#fff'}>
+      {/* <Box> */}
+        <Typography
+          variant="body2"
+          color={el.incoming ? theme.palette.text : "#fff"}
+        >
           {el.text}
         </Typography>
-        <Typography variant="caption" color={el.incoming ? 'text.secondary' : '#fff'} mt={0.5} >
-        {new Date(el.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} {/* Adjust the timestamp format as needed */}
-        </Typography>
+        {/* </Box> */}
+
+        <Stack
+          direction={"row"}
+          justifyContent={"center"}
+          alignItems={"center"}
+          spacing={1}
+          mt="4px"
+        >
+          <Typography
+            variant="caption"
+            color="#bebebed1"
+            mt={0.5}
+          >
+            {new Date(el.createdAt).toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
+            {/* Adjust the timestamp format as needed */}
+          </Typography>
+
+          {el.outgoing && (
+            <Box display="flex" alignItems="center">
+              {el.status === "Sent" && <IoCheckmark style={iconStyle} />}{" "}
+              {/* Tick */}
+              {el.status === "Delivered" && (
+                <IoCheckmarkDoneOutline style={iconStyle} />
+              )}{" "}
+              {/* Double Tick */}
+              {el.status === "Seen" && (
+                <IoCheckmarkDoneOutline style={iconStyle} />
+              )}{" "}
+              {/* Green Double Tick */}
+            </Box>
+          )}
+        </Stack>
+
       </Box>
+
       {/* {menu && <textOption />} */}
     </Stack>
   );
-
-
-
 };
 const MediaMsg = ({ el }) => {
   const theme = useTheme();
@@ -121,7 +165,7 @@ const MediaMsg = ({ el }) => {
     </Stack>
   );
 };
-const DocMsg = ({ el}) => {
+const DocMsg = ({ el }) => {
   const theme = useTheme();
   return (
     <Stack direction="row" justifyContent={el.incoming ? "start" : "end"}>
@@ -211,7 +255,7 @@ const LinkMsg = ({ el }) => {
     </Stack>
   );
 };
-const ReplyMsg = ({ el}) => {
+const ReplyMsg = ({ el }) => {
   const theme = useTheme();
   return (
     <Stack direction="row" justifyContent={el.incoming ? "start" : "end"}>

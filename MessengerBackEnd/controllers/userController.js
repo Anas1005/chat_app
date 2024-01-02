@@ -1,32 +1,36 @@
 const User = require("../models/userModel");
 const FriendRequest = require("../models/friendRequestModel");
 
-
 exports.getUsers = async (req, res, next) => {
     try {
-      const this_user = req.user;
-  
-      // Use MongoDB query to find users that meet the specified conditions
-      const remaining_users = await User.find({
-        verified: true,
-        _id: { $nin: [...this_user.friends, this_user._id] }
-      }).select("firstName lastName _id");
-  
-      console.log("Remaining Users:", remaining_users);
-  
-      res.status(200).json({
-        status: "success",
-        data:remaining_users,
-        message: "Users found successfully!",
-      });
+        const this_user = req.user;
+
+        // Get the IDs of users who have sent friend requests to the current user
+        const usersWithFriendRequests = await FriendRequest.find({ recipient: this_user._id })
+            .distinct('sender');
+
+        // Use MongoDB query to find users that meet the specified conditions
+        const remaining_users = await User.find({
+            verified: true,
+            _id: { $nin: [...this_user.friends, this_user._id, ...usersWithFriendRequests] }
+        }).select("firstName lastName _id");
+
+        console.log("Remaining Users:", remaining_users);
+
+        res.status(200).json({
+            status: "success",
+            data: remaining_users,
+            message: "Users found successfully!",
+        });
     } catch (error) {
-      console.error('Error in getUsers:', error.message);
-      res.status(500).json({
-        status: "error",
-        message: "Internal Server Error",
-      });
+        console.error('Error in getUsers:', error.message);
+        res.status(500).json({
+            status: "error",
+            message: "Internal Server Error",
+        });
     }
-  };
+};
+
 
 
 // Log function to print messages with timestamps
