@@ -148,7 +148,7 @@ const Chats = () => {
                 </Typography>
                 {/* Chat List */}
                 {sortedConversations?.filter((el) => !el.pinned).map((el, idx) => {
-                  return <ChatElement {...el} />;
+                  return <ChatElement key={idx} {...el} />;
                 })}
               </Stack>
             {/* </SimpleBarStyle> */}

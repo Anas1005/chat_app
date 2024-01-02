@@ -87,7 +87,7 @@ const Conversation = ({ isMobile }) => {
                 default:
                   return (
                     // Text Message
-                    <TextMsg el={el}  />
+                    <TextMsg key={idx} el={el}  />
                   );
               }
 
