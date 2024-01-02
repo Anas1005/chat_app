@@ -1,7 +1,6 @@
 import io from 'socket.io-client';
+import { BASE_URL } from './config';
 
-const isProduction = process.env.NODE_ENV === 'production';
-const socketServerURL = isProduction ? 'https://chat-app-backend-f9jz.onrender.com' : 'http://localhost:4000';
 
 let socket=null;
 
@@ -10,7 +9,7 @@ const connectSocket = (user_id) => {
   let newSocket;
     
   return new Promise((resolve, reject) => {
-    newSocket = io(socketServerURL, {
+    newSocket = io(BASE_URL, {
       query: `user_id=${user_id}`,
     });
 
