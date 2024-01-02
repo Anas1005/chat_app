@@ -91,7 +91,7 @@ const Group = () => {
                   </Typography>
                   {/* Chat List */}
                   {ChatList.filter((el) => el.pinned).map((el, idx) => {
-                    return <ChatElement {...el} />;
+                    return <ChatElement key={idx} {...el} />;
                   })}
                   <Typography variant="subtitle2" sx={{ color: "#676667" }}>
                     All Groups

@@ -115,8 +115,8 @@ const ChatInput = ({
                 display: openActions ? "inline-block" : "none",
               }}
             >
-              {Actions.map((el) => (
-                <Tooltip placement="right" title={el.title}>
+              {Actions.map((el,idx) => (
+                <Tooltip placement="right" key={idx} title={el.title}>
                   <Fab
                     onClick={() => {
                       // setOpenActions(!openActions);

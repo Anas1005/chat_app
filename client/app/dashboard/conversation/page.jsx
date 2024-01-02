@@ -56,7 +56,7 @@ const Conversation = ({ isMobile }) => {
             case "divider":
               return (
                 // Timeline
-                <Timeline el={el} />
+                <Timeline key={idx} el={el} />
               );
 
             case "msg":
@@ -64,24 +64,24 @@ const Conversation = ({ isMobile }) => {
                 case "img-video":
                   return (
                     // Media Message
-                    <MediaMsg el={el}  />
+                    <MediaMsg key={idx} el={el}  />
                   );
 
                 case "doc":
                   return (
                     // Doc Message
-                    <DocMsg el={el}  />
+                    <DocMsg key={idx} el={el}  />
                   );
                 case "link":
                   return (
                     //  Link Message
-                    <LinkMsg el={el}  />
+                    <LinkMsg key={idx} el={el}  />
                   );
 
                 case "reply":
                   return (
                     //  ReplyMessage
-                    <ReplyMsg el={el} />
+                    <ReplyMsg key={idx} el={el} />
                   );
 
                 default:
