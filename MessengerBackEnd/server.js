@@ -18,9 +18,14 @@ const http = require("http");
 
 const server = http.createServer(app);
 
+const isProduction = process.env.NODE_ENV === 'production';
+
+// Set the allowed origin based on the environment
+const allowedOrigin = isProduction ? 'https://chat-app-frontend-seven-jet.vercel.app' : 'http://localhost:3000';
+
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: allowedOrigin,
     methods: ["GET", "POST"],
   },
 });
