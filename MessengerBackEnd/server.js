@@ -1,5 +1,6 @@
 const app = require("./app");
 const { Server } = require("socket.io");
+const cron = require("node-cron"); // Import node-cron library
 const dotenv = require("dotenv");
 const dbConnect = require("./config/database");
 dotenv.config();
@@ -10,7 +11,7 @@ const Conversation = require("./models/conversationModel");
 
 process.on("uncaughtException", (err) => {
   console.log(err);
-  console.log("UNCAUGHT Exception! Shutting down ...");
+  console.log("UNCAUGHT Exception! Shutting down ....");
   process.exit(1); // Exit Code 1 indicates that a container shut down, either because of an application failure.
 });
 
@@ -31,6 +32,26 @@ const io = new Server(server, {
 });
 
 const PORT = process.env.PORT || 4000;
+
+// Define the cron job to perform a periodic operation every 5 seconds
+// cron.schedule('*/5 * * * * *', () => {
+//   console.log('Performing periodic operation...');
+// });
+app.get('/', async (req, res) => {
+  try {
+    // Perform the desired operation or task here
+    console.log('Handling Cron job...');
+
+    // You can also perform additional actions or tasks based on the incoming request
+
+    res.status(200).send('Cron job handled successfully');
+  } catch (error) {
+    console.error('Error handling Cron job:', error.message);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+
 
 dbConnect();
 
