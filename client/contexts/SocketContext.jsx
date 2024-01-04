@@ -10,7 +10,7 @@ import {
   AddDirectMessage,
   SetCurrentConversation,
 } from "@/redux/slices/conversationSlice";
-import { SelectConversation } from "@/redux/slices/appSlice";
+import { SelectConversation, SetNotifications } from "@/redux/slices/appSlice";
 import {
   SetOnlineUsers,
   UserOnline,
@@ -80,7 +80,8 @@ export const SocketProvider = ({ children }) => {
     });
 
     socket?.on("new_friend_request", (data) => {
-      toast.success(data.message);
+      // toast.success(data.message);
+      getNotifications();
       // dispatch(FetchFriendRequests());
     });
 
@@ -166,12 +167,20 @@ export const SocketProvider = ({ children }) => {
     socket?.emit("accept_request", data);
   };
 
+  const getNotifications=()=>{
+    console.log("Fetching Notifications...");
+    socket?.emit("get_notifications",{user_id},(data)=>{
+      console.log("Data",data)
+      dispatch(SetNotifications({notifications:data}))
+    })
+  }
+
   const startConversation = (data) => {
     socket?.emit("start_conversation", data);
   };
 
   const getDirectConversations = async () => {
-    console.log("Before Emitting");
+    console.log("Before Emitting",socket);
     socket?.emit("get_direct_conversations", { user_id }, (data) => {
       console.log("Getting DC In CallBack", data); // this data is the list of conversations
       // dispatch action
@@ -219,6 +228,7 @@ export const SocketProvider = ({ children }) => {
     acceptFriendRequest,
     startConversation,
     getDirectConversations,
+    getNotifications,
     joinChatRoom,
     getCurrentMessages,
     sendMessage,

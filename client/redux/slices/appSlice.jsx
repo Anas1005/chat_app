@@ -17,6 +17,10 @@ const initialState = {
   // all_users: [],
   friends: [], // all friends
   friendRequests: [], // all friend requests
+  notification: {
+    notifications: [],
+    unreadCount: 0,
+  },
   chat_type: null,
   room_id: null,
   onlineUsers: [],
@@ -61,6 +65,54 @@ const appSlice = createSlice({
     updateFriendRequests(state, action) {
       state.friendRequests = action.payload.requests;
     },
+    setNotifications(state, action) {
+      console.log("In Reducer",action.payload.notifications)
+      state.notification.notifications = action.payload.notifications;
+      state.notification.unreadCount = action.payload.notifications.filter(
+        (notification) => !notification.read
+      ).length;
+    },
+
+    markNotificationAsRead(state, action) {
+      const { notificationId } = action.payload;
+
+      // Find the index of the notification in the state by its ID
+      const notificationIndex = state.notification.notifications.findIndex(
+        (n) => n._id === notificationId
+      );
+
+      if (notificationIndex !== -1) {
+        // Create a new array with the updated notification
+        const updatedNotifications = [...state.notification.notifications];
+        updatedNotifications[notificationIndex] = {
+          ...updatedNotifications[notificationIndex],
+          read: true,
+        };
+
+        // Update the state with the new array and decrement the unread count
+        state.notification.notifications = updatedNotifications;
+        state.notification.unreadCount -= 1;
+      }
+    },
+
+    removeNotification(state, action) {
+      const notificationId = action.payload.notificationId;
+
+      // Filter out the notification with the specified ID
+      state.notification.notifications =
+        state.notification.notifications.filter(
+          (n) => n._id !== notificationId
+        );
+
+      // If the removed notification was unread, decrement the unread count
+      const removedNotification = state.notification.notifications.find(
+        (n) => n._id === notificationId
+      );
+      if (removedNotification && !removedNotification.read) {
+        state.notification.unreadCount -= 1;
+      }
+    },
+
     selectConversation(state, action) {
       state.chat_type = "individual";
       state.room_id = action.payload.room_id;
@@ -69,14 +121,16 @@ const appSlice = createSlice({
       state.onlineUsers = action.payload.onlineUsers;
     },
     userOnline: (state, action) => {
-      console.log("In UserOnnline Reducer......")
+      console.log("In UserOnnline Reducer......");
       state.onlineUsers.push(action.payload.user_id);
     },
     userOffline: (state, action) => {
       console.log("In UserOffline Reducer......");
       return {
         ...state,
-        onlineUsers: state.onlineUsers.filter((userId) => userId !== action.payload.user_id),
+        onlineUsers: state.onlineUsers.filter(
+          (userId) => userId !== action.payload.user_id
+        ),
       };
     },
   },
@@ -192,6 +246,35 @@ export function FetchFriendRequests() {
   };
 }
 
+export function SetNotifications({ notifications }) {
+  console.log("In Thunk",notifications)
+  return async (dispatch, getState) => {
+    dispatch(
+      appSlice.actions.setNotifications({
+        notifications,
+      })
+    );
+  };
+}
+export function MarkNotificationAsRead({ notificationId }) {
+  return async (dispatch, getState) => {
+    dispatch(
+      appSlice.actions.markNotificationAsRead({
+        notificationId,
+      })
+    );
+  };
+}
+export function RemoveNotification({ notificationId }) {
+  return async (dispatch, getState) => {
+    dispatch(
+      appSlice.actions.removeNotification({
+        notificationId,
+      })
+    );
+  };
+}
+
 export const SelectConversation = ({ room_id }) => {
   return async (dispatch, getState) => {
     dispatch(appSlice.actions.selectConversation({ room_id }));
@@ -205,14 +288,14 @@ export const SetOnlineUsers = ({ onlineUsers }) => {
 };
 
 export const UserOnline = ({ user_id }) => {
-  console.log("In UserOnnline Thunk......")
+  console.log("In UserOnnline Thunk......");
   return async (dispatch, getState) => {
     dispatch(appSlice.actions.userOnline({ user_id }));
   };
 };
 
 export const UserOffline = ({ user_id }) => {
-  console.log("In UserOffline Thunk......")
+  console.log("In UserOffline Thunk......");
   return async (dispatch, getState) => {
     dispatch(appSlice.actions.userOffline({ user_id }));
   };

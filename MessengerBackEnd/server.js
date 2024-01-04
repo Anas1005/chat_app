@@ -8,6 +8,7 @@ dotenv.config();
 const User = require("./models/userModel");
 const FriendRequest = require("./models/friendRequestModel");
 const Conversation = require("./models/conversationModel");
+const Notification = require("./models/notificationModel");
 
 process.on("uncaughtException", (err) => {
   console.log(err);
@@ -19,10 +20,12 @@ const http = require("http");
 
 const server = http.createServer(app);
 
-const isProduction = process.env.NODE_ENV === 'production';
+const isProduction = process.env.NODE_ENV === "production";
 
 // Set the allowed origin based on the environment
-const allowedOrigin = isProduction ? 'https://chat-app-frontend-seven-jet.vercel.app' : 'http://localhost:3000';
+const allowedOrigin = isProduction
+  ? "https://chat-app-frontend-seven-jet.vercel.app"
+  : "http://localhost:3000";
 
 const io = new Server(server, {
   cors: {
@@ -37,21 +40,19 @@ const PORT = process.env.PORT || 4000;
 // cron.schedule('*/5 * * * * *', () => {
 //   console.log('Performing periodic operation...');
 // });
-app.get('/', async (req, res) => {
+app.get("/", async (req, res) => {
   try {
     // Perform the desired operation or task here
-    console.log('Handling Cron job...');
+    console.log("Handling Cron job...");
 
     // You can also perform additional actions or tasks based on the incoming request
 
-    res.status(200).send('Cron job handled successfully');
+    res.status(200).send("Cron job handled successfully");
   } catch (error) {
-    console.error('Error handling Cron job:', error.message);
-    res.status(500).send('Internal Server Error');
+    console.error("Error handling Cron job:", error.message);
+    res.status(500).send("Internal Server Error");
   }
 });
-
-
 
 dbConnect();
 
@@ -81,7 +82,10 @@ io.on("connection", async (socket) => {
           "messages.status": "Sent",
         },
         { $set: { "messages.$[elem].status": "Delivered" } },
-        { arrayFilters: [{ "elem.status": "Sent", "elem.to": user_id }], multi: true }
+        {
+          arrayFilters: [{ "elem.status": "Sent", "elem.to": user_id }],
+          multi: true,
+        }
       );
       console.log("Update Result", updateResult);
 
@@ -108,6 +112,13 @@ io.on("connection", async (socket) => {
         recipient: data.to,
       });
 
+      await Notification.create({
+        type: "FRIEND_REQUEST",
+        sender: data.from,
+        recipient: data.to,
+        // content: `${data.from} sent you a friend request.`,
+      });
+
       // Emit event request received to recipient
       io.to(to?.socket_id).emit("new_friend_request", {
         message: "New friend request received",
@@ -121,6 +132,20 @@ io.on("connection", async (socket) => {
       console.log(`Friend request sent from ${data.from} to ${data.to}`);
     } catch (error) {
       console.error("Error handling friend request:", error.message);
+    }
+  });
+
+  // Event to fetch all notifications for a user
+  socket.on("get_notifications", async (data, callback) => {
+    console.log("Fetching Notfications");
+    try {
+      const notifications = await Notification.find({
+        recipient: data.user_id,
+      }).populate("sender", "firstName lastName avatar _id ");
+      console.log("Noti",notifications)
+      callback(notifications);
+    } catch (error) {
+      console.error("Error fetching notifications:", error.message);
     }
   });
 
@@ -238,56 +263,6 @@ io.on("connection", async (socket) => {
     callback(existing_conversations);
   });
 
-  // socket.on("send_message", async (data) => {
-  //   console.log("Send Message");
-  //   try {
-  //     console.log("Received message:", data);
-
-  //     // Destructure data
-  //     const { conversation_id, from, to, type, text, subtype } = data;
-
-  //     // Find user documents
-  //     const to_user = await User.findById(to);
-  //     const from_user = await User.findById(from);
-
-  //     console.log("Request Socket ID", socket.id);
-  //     console.log("SID in DB : ", from_user.socket_id);
-
-  //     // Create a new message object
-  //     const new_message = {
-  //       from,
-  //       to,
-  //       type,
-  //       text,
-  //       subtype,
-  //       createdAt: Date.now(),
-  //     };
-  //     console.log("New Message", new_message);
-
-  //     // Find and update Conversation document
-  //     const chat = await Conversation.findByIdAndUpdate(
-  //       conversation_id,
-  //       { $push: { messages: new_message } },
-  //       { new: true, validateModifiedOnly: true }
-  //     );
-
-  //     // Emit new message to the recipient
-  //     io.to(to_user?.socket_id).emit("new_message", {
-  //       conversation_id,
-  //       message: new_message,
-  //     });
-
-  //     // Emit new message to the sender
-  //     io.to(from_user?.socket_id).emit("new_message", {
-  //       conversation_id,
-  //       message: new_message,
-  //     });
-  //   } catch (error) {
-  //     console.error("Error processing text message:", error);
-  //     // Handle errors as needed
-  //   }
-  // });
-
   socket.on("send_message", async (data) => {
     console.log("Send Message");
     try {
@@ -313,7 +288,6 @@ io.on("connection", async (socket) => {
         createdAt: Date.now(),
         status: "", // Add a status property to the message
       };
-      
 
       const isRecipientOnline = to_user.status === "Online";
       const isRecipientInRoom =
@@ -371,17 +345,15 @@ io.on("connection", async (socket) => {
         socket.leave(room);
         console.log(`User left room: ${room}`);
       }
-      
     });
 
     // Join the new room
 
     const chatRoom = getChatRoomName(data.from, data.to);
-    console.log("RoomID:",getChatRoomName(data.from, data.to));
+    console.log("RoomID:", getChatRoomName(data.from, data.to));
     socket.join(chatRoom);
     console.log("NewSocketRooms", socket.rooms);
     console.log("NewSocketRoomsArray", Array.from(socket.rooms));
-
 
     console.log(`User ${data.from} joined the chat room ${chatRoom}`);
 
@@ -395,7 +367,7 @@ io.on("connection", async (socket) => {
     );
     console.log("Update Joinnnnn Chat Result:", updateResult);
 
-    const to_user=await User.findById(data.to);
+    const to_user = await User.findById(data.to);
 
     // Broadcast a user status update to all users in the chat room
     const userStatusUpdate = {

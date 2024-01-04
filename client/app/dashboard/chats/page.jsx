@@ -1,75 +1,75 @@
-'use client'
+"use client";
 
 import React, { useContext, useEffect, useState } from "react";
 import {
   Box,
   Button,
   Divider,
+  Badge,
   IconButton,
   Stack,
   Typography,
 } from "@mui/material";
 import { socket } from "@/socket";
-// import {
-//   ArchiveBox,
-//   CircleDashed,
-//   MagnifyingGlass,
-//   Users,
-// } from "phosphor-react";
-import { SimpleBarStyle } from "@/components/ScrollBar";
 import { useTheme } from "@mui/material/styles";
 import useResponsive from "@/hooks/useResponsive";
+import { HiOutlineUsers } from "react-icons/hi2";
+import { IoIosNotificationsOutline } from "react-icons/io";
 import BottomNav from "../BottomNav";
-// import { ChatList } from "@/data";
 import ChatElement from "@/components/ChatElement";
-import { Search, SearchIconWrapper, StyledInputBase } from "@/components/Search";
-import { FaArchive, FaCircle, FaSearch, FaUsers } from "react-icons/fa";
+import {
+  Search,
+  SearchIconWrapper,
+  StyledInputBase,
+} from "@/components/Search";
+import { FaArchive, FaSearch} from "react-icons/fa";
 import { SocketContext } from "@/contexts/SocketContext";
 import All from "@/sections/Dashboard/All";
 import { useDispatch, useSelector } from "react-redux";
-import './scrollBar.css'
-import { SetDirectConversations } from "@/redux/slices/conversationSlice";
+import "./scrollBar.css";
+
+import NotificationDialog from "@/sections/Dashboard/NotificationDialog";
 
 
-
-
-// const user_id = window?.localStorage.getItem("user_id");
 
 const Chats = () => {
   const theme = useTheme();
-  const {getDirectConversations} = useContext(SocketContext);
+  const { getDirectConversations, getNotifications } = useContext(SocketContext);
   const isDesktop = useResponsive("up", "md");
-  const{user_id, isLoggedIn} = useSelector((state)=>state.auth);
-  
+  const { user_id, isLoggedIn } = useSelector((state) => state.auth);
+
   const dispatch = useDispatch();
 
-
-  const {conversations, current_messages} = useSelector((state) => state.conversation.direct_chat);
-  console.log("Inside ChatList",conversations);
+  const { conversations, current_messages } = useSelector(
+    (state) => state.conversation.direct_chat
+  );
+  const {unreadCount} = useSelector((state)=>state.app.notification)
+  console.log("Inside ChatList", conversations);
   const sortedConversations = [...conversations].sort((a, b) => {
     // Assuming 'time' is in the format HH:mm AM/PM
     return new Date(b.time) - new Date(a.time);
   });
 
   useEffect(() => {
-    console.log("Getting DC Inside UE",socket); 
-    // socket?.emit("get_direct_conversations", { user_id }, (data) => {
-    //   console.log("Getting DC In CallBack",data); // this data is the list of conversations
-    //   // dispatch action
-
-    //   dispatch(SetDirectConversations({ conversationList: data , user_id}));
-    // });
-
+    console.log("Getting DC Inside UE", socket);
     getDirectConversations();
+    getNotifications();
   }, []);
 
   const [openDialog, setOpenDialog] = useState(false);
+  const [openNotificationDialog, setOpenNotDialog] = useState(false);
 
   const handleCloseDialog = () => {
     setOpenDialog(false);
   };
   const handleOpenDialog = () => {
     setOpenDialog(true);
+  };
+  const handleCloseNotDialog = () => {
+    setOpenNotDialog(false);
+  };
+  const handleOpenNotDialog = () => {
+    setOpenNotDialog(true);
   };
 
   return (
@@ -107,10 +107,26 @@ const Chats = () => {
                 }}
                 sx={{ width: "max-content" }}
               >
-                <FaUsers />
+                <HiOutlineUsers />
               </IconButton>
-              <IconButton sx={{ width: "max-content" }}>
-                <FaCircle/>
+              <IconButton
+                onClick={() => {
+                  handleOpenNotDialog();
+                }}
+                sx={{ width: "max-content", position: "relative" }}
+              >
+                <IoIosNotificationsOutline />
+                {unreadCount > 0 && (
+                  <Badge
+                    color="error"
+                    badgeContent={unreadCount}
+                    sx={{
+                      position: "absolute",
+                      top: 12,
+                      right: 8,
+                    }}
+                  />
+                )}
               </IconButton>
             </Stack>
           </Stack>
@@ -122,7 +138,7 @@ const Chats = () => {
               <StyledInputBase
                 placeholder="Search…"
                 inputProps={{ "aria-label": "search" }}
-                onClick={()=>socket?.emit("check","Hello Server")}
+                onClick={() => socket?.emit("check", "Hello Server")}
               />
             </Search>
           </Stack>
@@ -133,30 +149,41 @@ const Chats = () => {
             </Stack>
             <Divider />
           </Stack>
-          <Stack sx={{ flexGrow: 1, overflowY: "scroll", height: "100%"}} className=" custom-scrollbar ">
+          <Stack
+            sx={{ flexGrow: 1, overflowY: "scroll", height: "100%" }}
+            className=" custom-scrollbar "
+          >
             {/* <SimpleBarStyle timeout={500} clickOnTrack={false}> */}
-              <Stack spacing={2.4}>
-                <Typography variant="subtitle2" sx={{ color: "#676667" }}>
-                  Pinned
-                </Typography>
-                {/* Chat List */}
-                {sortedConversations?.filter((el) => el.pinned).map((el, idx) => {
+            <Stack spacing={2.4}>
+              <Typography variant="subtitle2" sx={{ color: "#676667" }}>
+                Pinned
+              </Typography>
+              {/* Chat List */}
+              {sortedConversations
+                ?.filter((el) => el.pinned)
+                .map((el, idx) => {
                   return <ChatElement key={idx} {...el} />;
                 })}
-                <Typography variant="subtitle2" sx={{ color: "#676667" }}>
-                  All Chats
-                </Typography>
-                {/* Chat List */}
-                {sortedConversations?.filter((el) => !el.pinned).map((el, idx) => {
+              <Typography variant="subtitle2" sx={{ color: "#676667" }}>
+                All Chats
+              </Typography>
+              {/* Chat List */}
+              {sortedConversations
+                ?.filter((el) => !el.pinned)
+                .map((el, idx) => {
                   return <ChatElement key={idx} {...el} />;
                 })}
-              </Stack>
+            </Stack>
             {/* </SimpleBarStyle> */}
           </Stack>
         </Stack>
       </Box>
-      {openDialog && (
-        <All open={openDialog} handleClose={handleCloseDialog} />
+      {openDialog && <All open={openDialog} handleClose={handleCloseDialog} />}
+      {openNotificationDialog && (
+        <NotificationDialog
+          open={openNotificationDialog}
+          handleClose={handleCloseNotDialog}
+        />
       )}
     </>
   );

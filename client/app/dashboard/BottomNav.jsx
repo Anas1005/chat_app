@@ -34,15 +34,16 @@ const BottomNav = () => {
         spacing={2}
         p={2}
       >
-        {Nav_Buttons.map((el) => {
+        {Nav_Buttons.map((el,idx) => {
           return el.index === selectedTab ? (
-            <Box sx={{ backgroundColor: theme.palette.primary.main, borderRadius: 1.5 }} p={1}>
+            <Box key={idx} sx={{ backgroundColor: theme.palette.primary.main, borderRadius: 1.5 }} p={1}>
               <IconButton sx={{ width: "max-content", color: "#ffffff" }}>
                 {el.icon}
               </IconButton>
             </Box>
           ) : (
             <IconButton
+              key={idx}
               onClick={() => {
                 handleChangeTab(el.index);
               }}

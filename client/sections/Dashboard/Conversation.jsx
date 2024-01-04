@@ -9,6 +9,7 @@ import {
   Divider,
 } from "@mui/material";
 import { useTheme, alpha } from "@mui/material/styles";
+import { motion } from "framer-motion";
 import { BsThreeDotsVertical, BsDownload, BsImage } from "react-icons/bs";
 // import { DotsThreeVertical, DownloadSimple, Image } from "phosphor-react";
 // import { text_options } from "@/data";
@@ -64,7 +65,17 @@ const TextMsg = ({ el }) => {
   };
 
   return (
-    <Stack direction="row" justifyContent={el.incoming ? "start" : "end"}>
+    <Stack
+      direction="row"
+      justifyContent={el.incoming ? "start" : "end"}
+      component={motion.div}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1, transition: { duration: 1 } }}
+      // whileHover={{
+      //   backgroundColor: "rgb(25 ,33, 41)",
+      //   transition: { duration: 0.3 },
+      // }}
+    >
       <Box
         px={1.5}
         pt={1.5}
@@ -76,13 +87,13 @@ const TextMsg = ({ el }) => {
           width: "max-content",
           display: "flex",
           flexDirection: "row",
-          columnGap:"12px",
-          paddingBottom:el.outgoing?"4px":"8px"
+          columnGap: "12px",
+          paddingBottom: el.outgoing ? "4px" : "8px",
           // rowGap:"14"
           // alignItems: el.incoming ? 'flex-start' : 'flex-end',
         }}
       >
-      {/* <Box> */}
+        {/* <Box> */}
         <Typography
           variant="body2"
           color={el.incoming ? theme.palette.text : "#fff"}
@@ -98,11 +109,7 @@ const TextMsg = ({ el }) => {
           spacing={1}
           mt="4px"
         >
-          <Typography
-            variant="caption"
-            color="#bebebed1"
-            mt={0.5}
-          >
+          <Typography variant="caption" color="#bebebed1" mt={0.5}>
             {new Date(el.createdAt).toLocaleTimeString([], {
               hour: "2-digit",
               minute: "2-digit",
@@ -125,7 +132,6 @@ const TextMsg = ({ el }) => {
             </Box>
           )}
         </Stack>
-
       </Box>
 
       {/* {menu && <textOption />} */}
