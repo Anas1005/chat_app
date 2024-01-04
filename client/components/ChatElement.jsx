@@ -6,6 +6,7 @@ import { styled, useTheme, alpha } from "@mui/material/styles";
 import { useDispatch, useSelector } from "react-redux";
 import { IoCheckmark, IoCheckmarkDoneOutline } from "react-icons/io5";
 import { SelectConversation } from "@/redux/slices/appSlice";
+import { ResetUnreadCountOfDC } from "@/redux/slices/conversationSlice";
 // import { SelectConversation } from "../redux/slices/app";
 
 const truncateText = (string, n) => {
@@ -121,6 +122,7 @@ const ChatElement = ({
     <StyledChatBox
       onClick={() => {
         dispatch(SelectConversation({ room_id: id }));
+        dispatch(ResetUnreadCountOfDC({ conversationId: id }));
       }}
       sx={{
         width: "100%",
@@ -156,7 +158,9 @@ const ChatElement = ({
             <Avatar alt={name} src={img} />
           )}
           <Stack spacing={0.3}>
-            <Typography variant="subtitle2" fontSize="0.9rem">{name}</Typography>
+            <Typography variant="subtitle2" fontSize="0.9rem">
+              {name}
+            </Typography>
 
             {outgoing ? (
               <Box display="flex" alignItems="center" columnGap="4px">
@@ -170,19 +174,27 @@ const ChatElement = ({
                   <IoCheckmarkDoneOutline style={iconStyle} />
                 )}{" "}
                 {/* Green Double Tick */}
-                <Typography variant="caption" color="#c5c5c5" fontSize="0.825rem">
+                <Typography
+                  variant="caption"
+                  color="#c5c5c5"
+                  fontSize="0.825rem"
+                >
                   {truncateText(msg, 20)}
                 </Typography>
               </Box>
             ) : (
-              <Typography variant="caption" color="#c5c5c5" fontSize="0.825rem">{truncateText(msg, 20)}</Typography>
+              <Typography variant="caption" color="#c5c5c5" fontSize="0.825rem">
+                {truncateText(msg, 20)}
+              </Typography>
             )}
           </Stack>
         </Stack>
         <Stack spacing={2} alignItems={"center"}>
-          <Typography sx={{ fontWeight: 600 }} variant="caption">
-            {time ? formatDate(time) : ""}
-          </Typography>
+          {msg && (
+            <Typography sx={{ fontWeight: 600 }} variant="caption">
+              {formatDate(time)}
+            </Typography>
+          )}
           <Badge
             className="unread-count"
             color="primary"
