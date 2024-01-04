@@ -74,7 +74,7 @@ const appSlice = createSlice({
     },
 
     markNotificationAsRead(state, action) {
-      const { notificationId } = action.payload;
+      const notificationId  = action.payload.notificationId;
 
       // Find the index of the notification in the state by its ID
       const notificationIndex = state.notification.notifications.findIndex(
@@ -98,6 +98,10 @@ const appSlice = createSlice({
     removeNotification(state, action) {
       const notificationId = action.payload.notificationId;
 
+      const removedNotification = state.notification.notifications.find(
+        (n) => n._id === notificationId
+      );
+
       // Filter out the notification with the specified ID
       state.notification.notifications =
         state.notification.notifications.filter(
@@ -105,9 +109,8 @@ const appSlice = createSlice({
         );
 
       // If the removed notification was unread, decrement the unread count
-      const removedNotification = state.notification.notifications.find(
-        (n) => n._id === notificationId
-      );
+      
+      console.log("Read",removedNotification)
       if (removedNotification && !removedNotification.read) {
         state.notification.unreadCount -= 1;
       }
@@ -258,20 +261,37 @@ export function SetNotifications({ notifications }) {
 }
 export function MarkNotificationAsRead({ notificationId }) {
   return async (dispatch, getState) => {
-    dispatch(
-      appSlice.actions.markNotificationAsRead({
-        notificationId,
-      })
-    );
+    try {
+      // Make the API call to mark the notification as read with notificationId in the request body
+      dispatch(appSlice.actions.markNotificationAsRead({ notificationId }));
+      const response= await apiConnector('POST', '/user/mark-notification-as-read', { notificationId }, {
+        Authorization: `Bearer ${getState().auth.token}`,
+      });
+
+      // Dispatch the action to update the state
+     
+    } catch (error) {
+      // Handle the error, maybe dispatch an error action or log it
+      console.error('Error marking notification as read:', error.message);
+    }
   };
 }
+
 export function RemoveNotification({ notificationId }) {
   return async (dispatch, getState) => {
-    dispatch(
-      appSlice.actions.removeNotification({
-        notificationId,
-      })
-    );
+    try {
+      // Make the API call to remove the notification with notificationId in the request body
+      dispatch(appSlice.actions.removeNotification({ notificationId }));
+      await apiConnector('POST', '/user/remove-notification', { notificationId }, {
+        Authorization: `Bearer ${getState().auth.token}`,
+      });
+
+      // Dispatch the action to update the state
+    
+    } catch (error) {
+      // Handle the error, maybe dispatch an error action or log it
+      console.error('Error removing notification:', error.message);
+    }
   };
 }
 

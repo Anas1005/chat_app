@@ -20,24 +20,27 @@ import {
 import { RxCross2 } from "react-icons/rx";
 import { motion } from "framer-motion";
 import { faker } from "@faker-js/faker";
+import {
+  MarkNotificationAsRead,
+  RemoveNotification,
+} from "@/redux/slices/appSlice";
 import "./scrollBar.css";
 import { IoCheckmark } from "react-icons/io5";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-
-const Notification = ({ type,sender,createdAt,read}) => {
+const Notification = ({ _id, type, sender, createdAt, read }) => {
+  const dispatch = useDispatch();
   const handleMarkAsRead = () => {
-    // Add logic to mark the notification as read
-    console.log('Mark as Read clicked');
+    dispatch(MarkNotificationAsRead({ notificationId: _id }));
   };
 
   const handleRemoveNotification = () => {
-    // Add logic to remove the notification
-    console.log('Remove Notification clicked');
+    console.log("Remove Notification clicked");
+    dispatch(RemoveNotification({ notificationId: _id }));
   };
 
   return (
@@ -47,45 +50,65 @@ const Notification = ({ type,sender,createdAt,read}) => {
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1, transition: { duration: 1 } }}
       whileHover={{
-        backgroundColor: 'rgb(25 ,33, 41)',
+        backgroundColor: "rgb(25 ,33, 41)",
         transition: { duration: 0.3 },
       }}
       style={{
-        display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        padding: '12px',
-        cursor: 'pointer',
-        backgroundColor: read ? 'inherit' : 'rgb(79 79 79 / 68%)', // Add background color for read notifications
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        padding: "12px",
+        cursor: "pointer",
+        backgroundColor: read ? "inherit" : "rgb(46 54 63)", // Add background color for read notifications
       }}
     >
-      <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+      <div
+        style={{ display: "flex", flexDirection: "row", alignItems: "center" }}
+      >
         <Badge
           overlap="circular"
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+          anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
           variant="dot"
-          style={{ marginRight: '8px' }}
+          style={{ marginRight: "8px" }}
         >
           <Avatar alt={sender?.firstName} src={faker.image.avatar()} />
         </Badge>
-        <div style={{ display: 'flex', flexDirection: 'column', marginLeft: '4px' }}>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            marginLeft: "4px",
+          }}
+        >
           <Box>
-            <span style={{ fontWeight: 'bold' }}>{sender?.firstName}{" "}{sender?.lastName}</span>
-            <span>{type === 'MESSAGE' ? ' sent you a message: ' : ' sent you a friend request: '}</span>
+            <span style={{ fontWeight: "bold" }}>
+              {sender?.firstName} {sender?.lastName}
+            </span>
+            <span>
+              {type === "MESSAGE"
+                ? " sent you a message: "
+                : type === "FRIEND_REQUEST"
+                ? " sent you a friend request: "
+                : type === "ACCEPT_FRIEND_REQUEST"
+                ? " accepted your friend request: "
+                : ""}
+            </span>
           </Box>
-          <Typography style={{ color: '#999', fontSize: '0.8rem', marginTop: '4px' }}>
-            {new Date(createdAt).toLocaleDateString('en-US', {
-              month: 'short',
-              day: 'numeric',
-              year: 'numeric',
+          <Typography
+            style={{ color: "#999", fontSize: "0.8rem", marginTop: "4px" }}
+          >
+            {new Date(createdAt).toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
             })}
           </Typography>
         </div>
       </div>
-      <div style={{ display: 'flex', alignItems: 'center' }}>
+      <div style={{ display: "flex", alignItems: "center" }}>
         {!read && (
-          <IconButton onClick={handleMarkAsRead} style={{ marginRight: '8px' }}>
+          <IconButton onClick={handleMarkAsRead} style={{ marginRight: "8px" }}>
             <IoCheckmark color="primary" />
           </IconButton>
         )}
@@ -97,85 +120,84 @@ const Notification = ({ type,sender,createdAt,read}) => {
   );
 };
 
-
 const NotificationDialog = ({ open, handleClose }) => {
-// Sample Notifications
-// const sampleNotifications = [
-//   {
-//     type: 'MESSAGE',
-//     sender: 'JohnDoe',
-//     content: 'Hi there!',
-//     timestamp: new Date(),
-//     img: faker.image.avatar(),
-//     name: 'John Doe',
-//     read: false,
-//   },
-//   {
-//     type: 'FRIEND_REQUEST',
-//     sender: 'JaneSmith',
-//     content: 'Wants to be your friend.',
-//     timestamp: new Date(),
-//     img: faker.image.avatar(),
-//     name: 'Jane Smith',
-//     read: true,
-//   },
-//   {
-//     type: 'MESSAGE',
-//     sender: 'AliceJones',
-//     content: 'How are you?',
-//     timestamp: new Date(),
-//     img: faker.image.avatar(),
-//     name: 'Alice Jones',
-//     read: false,
-//   },
-//   {
-//     type: 'FRIEND_REQUEST',
-//     sender: 'BobJohnson',
-//     content: 'Sent you a friend request.',
-//     timestamp: new Date(),
-//     img: faker.image.avatar(),
-//     name: 'Bob Johnson',
-//     read: true,
-//   },
-//   {
-//     type: 'MESSAGE',
-//     sender: 'EvaWhite',
-//     content: 'What are you up to?',
-//     timestamp: new Date(),
-//     img: faker.image.avatar(),
-//     name: 'Eva White',
-//     read: false,
-//   },
-//   {
-//     type: 'FRIEND_REQUEST',
-//     sender: 'CharlieBrown',
-//     content: 'Wants to connect with you.',
-//     timestamp: new Date(),
-//     img: faker.image.avatar(),
-//     name: 'Charlie Brown',
-//     read: true,
-//   },
-//   {
-//     type: 'MESSAGE',
-//     sender: 'GraceMiller',
-//     content: 'Hello!',
-//     timestamp: new Date(),
-//     img: faker.image.avatar(),
-//     name: 'Grace Miller',
-//     read: false,
-//   },
-//   {
-//     type: 'FRIEND_REQUEST',
-//     sender: 'CharlieBrown',
-//     content: 'Wants to connect with you.',
-//     timestamp: new Date(),
-//     img: faker.image.avatar(),
-//     name: 'Charlie Brown',
-//     read: true,
-//   },
-// ];
-const {notifications} = useSelector((state)=>state.app.notification);
-console.log("In Dialog",notifications)
+  // Sample Notifications
+  // const sampleNotifications = [
+  //   {
+  //     type: 'MESSAGE',
+  //     sender: 'JohnDoe',
+  //     content: 'Hi there!',
+  //     timestamp: new Date(),
+  //     img: faker.image.avatar(),
+  //     name: 'John Doe',
+  //     read: false,
+  //   },
+  //   {
+  //     type: 'FRIEND_REQUEST',
+  //     sender: 'JaneSmith',
+  //     content: 'Wants to be your friend.',
+  //     timestamp: new Date(),
+  //     img: faker.image.avatar(),
+  //     name: 'Jane Smith',
+  //     read: true,
+  //   },
+  //   {
+  //     type: 'MESSAGE',
+  //     sender: 'AliceJones',
+  //     content: 'How are you?',
+  //     timestamp: new Date(),
+  //     img: faker.image.avatar(),
+  //     name: 'Alice Jones',
+  //     read: false,
+  //   },
+  //   {
+  //     type: 'FRIEND_REQUEST',
+  //     sender: 'BobJohnson',
+  //     content: 'Sent you a friend request.',
+  //     timestamp: new Date(),
+  //     img: faker.image.avatar(),
+  //     name: 'Bob Johnson',
+  //     read: true,
+  //   },
+  //   {
+  //     type: 'MESSAGE',
+  //     sender: 'EvaWhite',
+  //     content: 'What are you up to?',
+  //     timestamp: new Date(),
+  //     img: faker.image.avatar(),
+  //     name: 'Eva White',
+  //     read: false,
+  //   },
+  //   {
+  //     type: 'FRIEND_REQUEST',
+  //     sender: 'CharlieBrown',
+  //     content: 'Wants to connect with you.',
+  //     timestamp: new Date(),
+  //     img: faker.image.avatar(),
+  //     name: 'Charlie Brown',
+  //     read: true,
+  //   },
+  //   {
+  //     type: 'MESSAGE',
+  //     sender: 'GraceMiller',
+  //     content: 'Hello!',
+  //     timestamp: new Date(),
+  //     img: faker.image.avatar(),
+  //     name: 'Grace Miller',
+  //     read: false,
+  //   },
+  //   {
+  //     type: 'FRIEND_REQUEST',
+  //     sender: 'CharlieBrown',
+  //     content: 'Wants to connect with you.',
+  //     timestamp: new Date(),
+  //     img: faker.image.avatar(),
+  //     name: 'Charlie Brown',
+  //     read: true,
+  //   },
+  // ];
+  const { notifications } = useSelector((state) => state.app.notification);
+  console.log("In Dialog", notifications);
 
   return (
     <Dialog

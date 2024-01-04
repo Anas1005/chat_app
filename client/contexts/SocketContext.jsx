@@ -1,7 +1,7 @@
 // SocketProvider.js
 "use client";
 
-import React, { createContext, useContext, useEffect } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import {
   SetDirectConversations,
   UpdateDirectConversation,
@@ -10,7 +10,13 @@ import {
   AddDirectMessage,
   SetCurrentConversation,
 } from "@/redux/slices/conversationSlice";
-import { SelectConversation, SetNotifications } from "@/redux/slices/appSlice";
+import {
+  SelectConversation,
+  SetNotifications,
+  FetchUsers,
+  FetchFriends,
+  FetchFriendRequests,
+} from "@/redux/slices/appSlice";
 import {
   SetOnlineUsers,
   UserOnline,
@@ -24,13 +30,14 @@ import { useDispatch, useSelector } from "react-redux";
 export const SocketContext = createContext();
 
 export const SocketProvider = ({ children }) => {
-  const SOCKET_SERVER_URL = "http://localhost:4000";
   const { isLoggedIn, user_id } = useSelector((state) => state.auth);
   const { current_conversation, conversations, current_messages } = useSelector(
     (state) => state.conversation.direct_chat
   );
   const { room_id } = useSelector((state) => state.app);
   const dispatch = useDispatch();
+
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     console.log("Socket In AppConetxt", socket);
@@ -61,7 +68,7 @@ export const SocketProvider = ({ children }) => {
           getCurrentMessages();
         }
       }
-      console.log("Before GDC.....")
+      console.log("Before GDC.....");
       getDirectConversations();
     });
 
@@ -77,23 +84,36 @@ export const SocketProvider = ({ children }) => {
     socket?.on("request_sent", (data) => {
       console.log("Request Sent");
       toast.success(data.message);
+      dispatch(FetchUsers());
     });
 
     socket?.on("new_friend_request", (data) => {
       // toast.success(data.message);
       getNotifications();
       // dispatch(FetchFriendRequests());
+    
+      const audioElement = document.getElementById('notificationSound');
+      console.log("Audio",audioElement)
+      if (audioElement) {
+        audioElement.play();
+      }
     });
 
+
     socket?.on("request_accepted", (data) => {
-      toast.success(data.message);
+      // toast.success(data.message);
+      getNotifications();
+      const audioElement = document.getElementById('notificationSound');
+      if (audioElement) {
+        audioElement.play();
+      }
       // dispatch(FetchFriends());
     });
 
     socket?.on("start_chat", (data) => {
       console.log(data);
       // add / update to conversation list
-      console.log("Strating The Chat...")
+      console.log("Strating The Chat...");
       const existing_conversation = conversations?.find(
         (el) => el?.id === data._id
       );
@@ -134,6 +154,16 @@ export const SocketProvider = ({ children }) => {
       }
 
       getDirectConversations();
+      if (
+        message?.to === user_id &&
+        (message?.status === "Delivered" || message?.status === "Sent")
+      ) {
+        getNotifications();
+        const audioElement = document.getElementById('notificationSound');
+        if (audioElement) {
+          audioElement.play();
+        }
+      }
     });
 
     return () => {
@@ -153,34 +183,42 @@ export const SocketProvider = ({ children }) => {
     user_id,
     room_id,
     current_conversation,
-    conversations
-  
+    conversations,
   ]);
 
   const sendFriendRequest = (data) => {
+    setLoading(true);
     socket?.emit("friend_request", data, () => {
       // alert("request sent");
+      setLoading(false);
     });
   };
 
   const acceptFriendRequest = (data) => {
-    socket?.emit("accept_request", data);
+    setLoading(true);
+    socket?.emit("accept_request", data, () => {
+      dispatch(FetchFriendRequests())
+      setLoading(false);
+    });
   };
 
-  const getNotifications=()=>{
+  const getNotifications = () => {
     console.log("Fetching Notifications...");
-    socket?.emit("get_notifications",{user_id},(data)=>{
-      console.log("Data",data)
-      dispatch(SetNotifications({notifications:data}))
-    })
-  }
+    socket?.emit("get_notifications", { user_id }, (data) => {
+      console.log("Data", data);
+      dispatch(SetNotifications({ notifications: data }));
+    });
+  };
 
   const startConversation = (data) => {
-    socket?.emit("start_conversation", data);
+    setLoading(true);
+    socket?.emit("start_conversation", data, () => {
+      setLoading(false);
+    });
   };
 
   const getDirectConversations = async () => {
-    console.log("Before Emitting",socket);
+    console.log("Before Emitting", socket);
     socket?.emit("get_direct_conversations", { user_id }, (data) => {
       console.log("Getting DC In CallBack", data); // this data is the list of conversations
       // dispatch action
@@ -224,6 +262,7 @@ export const SocketProvider = ({ children }) => {
   //   }, [socket]);
 
   const value = {
+    loading,
     sendFriendRequest,
     acceptFriendRequest,
     startConversation,

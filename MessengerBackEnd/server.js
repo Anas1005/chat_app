@@ -101,7 +101,7 @@ io.on("connection", async (socket) => {
     }
   }
 
-  socket.on("friend_request", async (data) => {
+  socket.on("friend_request", async (data,callback) => {
     try {
       const to = await User.findById(data.to).select("socket_id");
       const from = await User.findById(data.from).select("socket_id");
@@ -129,6 +129,8 @@ io.on("connection", async (socket) => {
         message: "Request Sent successfully!",
       });
 
+      callback();
+
       console.log(`Friend request sent from ${data.from} to ${data.to}`);
     } catch (error) {
       console.error("Error handling friend request:", error.message);
@@ -141,15 +143,17 @@ io.on("connection", async (socket) => {
     try {
       const notifications = await Notification.find({
         recipient: data.user_id,
-      }).populate("sender", "firstName lastName avatar _id ");
-      console.log("Noti",notifications)
+      })
+        .populate("sender", "firstName lastName avatar _id")
+        .sort({ createdAt: -1 });
+      console.log("Noti", notifications);
       callback(notifications);
     } catch (error) {
       console.error("Error fetching notifications:", error.message);
     }
   });
 
-  socket.on("accept_request", async (data) => {
+  socket.on("accept_request", async (data,callback) => {
     console.log("Accepting friend request:", data);
 
     try {
@@ -169,6 +173,12 @@ io.on("connection", async (socket) => {
         User.findByIdAndUpdate(receiver._id, {
           $push: { friends: requestDoc.sender },
         }),
+        Notification.create({
+          type: "ACCEPT_FRIEND_REQUEST",
+          sender: requestDoc.recipient,
+          recipient: requestDoc.sender,
+          // content: `${data.from} sent you a friend request.`,
+        })
       ]);
 
       // Delete the friend request document
@@ -183,13 +193,15 @@ io.on("connection", async (socket) => {
         message: "Friend Request Accepted",
       });
 
+      callback();
+
       console.log("Friend request accepted and events emitted");
     } catch (error) {
       console.error("Error accepting friend request:", error.message);
     }
   });
 
-  socket.on("start_conversation", async (data) => {
+  socket.on("start_conversation", async (data,callback) => {
     try {
       // Destructure data
       const { to, from } = data;
@@ -223,6 +235,8 @@ io.on("connection", async (socket) => {
       else {
         socket.emit("start_chat", existing_conversations[0]);
       }
+
+      callback();
     } catch (error) {
       console.error("Error starting conversation:", error);
       // Handle errors as needed
@@ -304,8 +318,18 @@ io.on("connection", async (socket) => {
         new_message.status = "Seen";
       } else if (isRecipientOnline) {
         new_message.status = "Delivered";
+        await Notification.create({
+          type: "MESSAGE",
+          sender: from,
+          recipient: to,
+        });
       } else {
         new_message.status = "Sent";
+        await Notification.create({
+          type: "MESSAGE",
+          sender: from,
+          recipient: to,
+        });
       }
       console.log("New Message", new_message);
 

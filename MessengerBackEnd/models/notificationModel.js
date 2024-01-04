@@ -4,7 +4,7 @@ const notificationSchema = new mongoose.Schema({
   type: {
     type: String,
     required: true,
-    enum: ['MESSAGE', 'FRIEND_REQUEST'], // Add more types as needed
+    enum: ['MESSAGE','FRIEND_REQUEST','ACCEPT_FRIEND_REQUEST'], // Add more types as needed
   },
   sender: {
     type: mongoose.Schema.Types.ObjectId,

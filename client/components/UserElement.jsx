@@ -9,6 +9,7 @@ import {
   IconButton,
   Button,
 } from "@mui/material";
+import { LoadingButton } from "@mui/lab";
 import { styled, useTheme } from "@mui/material/styles";
 import { IoChatboxEllipsesOutline } from "react-icons/io5";
 // import { socket } from "@/socket";
@@ -53,7 +54,7 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
 const UserElement = ({ img, firstName, lastName, online, _id }) => {
   const theme = useTheme();
   const { user_id } = useSelector((state) => state.auth);
-  const {sendFriendRequest} = useContext(SocketContext);
+  const { loading, sendFriendRequest } = useContext(SocketContext);
 
   const name = `${firstName} ${lastName}`;
 
@@ -91,16 +92,14 @@ const UserElement = ({ img, firstName, lastName, online, _id }) => {
           </Stack>
         </Stack>
         <Stack direction={"row"} spacing={2} alignItems={"center"}>
-          <Button
+          <LoadingButton
+            loading={loading}
             onClick={() => {
-              // socket.emit("friend_request", { to: _id, from: user_id }, () => {
-              //   // alert("request sent");
-              // });
               sendFriendRequest({ to: _id, from: user_id });
             }}
           >
             Send Request
-          </Button>
+          </LoadingButton>
         </Stack>
       </Stack>
     </StyledChatBox>
@@ -117,7 +116,7 @@ const FriendRequestElement = ({
   id,
 }) => {
   const theme = useTheme();
-  const {acceptFriendRequest} = useContext(SocketContext);
+  const { loading, acceptFriendRequest } = useContext(SocketContext);
 
   const name = `${firstName} ${lastName}`;
 
@@ -155,16 +154,14 @@ const FriendRequestElement = ({
           </Stack>
         </Stack>
         <Stack direction={"row"} spacing={2} alignItems={"center"}>
-          <Button
+          <LoadingButton
+            loading={loading}
             onClick={() => {
-              //  emit "accept_request" event
-              // socket.emit("accept_request", { request_id: id });
-
               acceptFriendRequest({ request_id: id });
             }}
           >
             Accept Request
-          </Button>
+          </LoadingButton>
         </Stack>
       </Stack>
     </StyledChatBox>
@@ -183,7 +180,7 @@ const FriendElement = ({
   _id,
 }) => {
   const { user_id } = useSelector((state) => state.auth);
-  const {startConversation} = useContext(SocketContext);
+  const { loading, startConversation } = useContext(SocketContext);
   const theme = useTheme();
 
   const name = `${firstName} ${lastName}`;
@@ -222,15 +219,18 @@ const FriendElement = ({
           </Stack>
         </Stack>
         <Stack direction={"row"} spacing={2} alignItems={"center"}>
-          <IconButton
+          <LoadingButton
+            loading={loading}
             onClick={() => {
               // start a new conversation
               // socket.emit("start_conversation", { to: _id, from: user_id });
               startConversation({ to: _id, from: user_id });
             }}
           >
-            <IoChatboxEllipsesOutline />
-          </IconButton>
+            <IconButton>
+              <IoChatboxEllipsesOutline />
+            </IconButton>
+          </LoadingButton>
         </Stack>
       </Stack>
     </StyledChatBox>

@@ -3,6 +3,7 @@ import "./globals.css";
 import { ReduxProvider } from "@/redux/ReduxProvider";
 import { SocketProvider } from "@/contexts/SocketContext";
 import ToasterContext from "@/contexts/ToasterContext";
+import AudioNotification from "@/NotificationSound/AudioNotification";
 import StyledEngineProvider from "@mui/material/StyledEngineProvider";
 import ThemeProvider from "@/theme";
 import SettingsProvider from "@/contexts/SettingsContext";
@@ -20,7 +21,9 @@ export default function RootLayout({ children }) {
       <body className={inter.className}>
         <ReduxProvider>
           <SocketProvider>
+          <AudioNotification/>
             <ToasterContext />
+            
             {/* <StyledEngineProvider injectFirst> */}
               <ThemeProvider>
                 <SettingsProvider>
