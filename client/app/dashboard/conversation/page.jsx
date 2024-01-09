@@ -47,8 +47,10 @@ const Conversation = ({ isMobile, scrollRef }) => {
     // });
 
     // dispatch(SetCurrentConversation(current));
-    joinChatRoom();
-    getCurrentMessages();
+    if (room_id) {
+      joinChatRoom();
+      getCurrentMessages();
+    }
   }, [room_id]);
 
   return (

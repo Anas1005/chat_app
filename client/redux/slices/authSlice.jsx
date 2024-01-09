@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import { apiConnector } from "@/services/apiConnector";
 import { toast } from "react-hot-toast";
 import { connectSocket } from "@/socket";
+import appSlice from "./appSlice";
 // import { showSnackbar } from "./app";
 
 // ----------------------------------------------------------------------

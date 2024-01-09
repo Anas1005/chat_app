@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { IoCheckmark, IoCheckmarkDoneOutline } from "react-icons/io5";
 import { SelectConversation } from "@/redux/slices/appSlice";
 import { ResetUnreadCountOfDC } from "@/redux/slices/conversationSlice";
+import MessengerTypingAnimation from "./Chat/TypingAnimation";
 // import { SelectConversation } from "../redux/slices/app";
 
 const truncateText = (string, n) => {
@@ -163,7 +164,7 @@ const ChatElement = ({
             </Typography>
 
             {
-              isFriendTyping ? "typing...":
+              isFriendTyping ? <MessengerTypingAnimation/>:
               
               outgoing ? (
               <Box display="flex" alignItems="center" columnGap="4px">

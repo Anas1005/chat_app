@@ -59,6 +59,8 @@ import { IoCheckmark, IoCheckmarkDoneOutline } from "react-icons/io5";
 
 const TextMsg = ({ el }) => {
   const theme = useTheme();
+  // const {typingUsers } = useSelector((state) => state.app);
+  // let isFriendTyping = typingUsers?.includes(user_id);
   const iconStyle = {
     fontSize: "1.5rem", // Adjust the size as needed
     color: el.status === "Seen" ? "#04e813" : "#f2f3f2", // Adjust the colors as needed
@@ -76,6 +78,7 @@ const TextMsg = ({ el }) => {
       //   transition: { duration: 0.3 },
       // }}
     >
+
       <Box
         px={1.5}
         pt={1.5}

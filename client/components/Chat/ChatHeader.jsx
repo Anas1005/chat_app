@@ -20,6 +20,7 @@ import { faker } from "@faker-js/faker";
 import useResponsive from "@/hooks/useResponsive";
 import { ToggleSidebar } from "@/redux/slices/appSlice";
 import { useDispatch, useSelector } from "react-redux";
+import MessengerTypingAnimation from "./TypingAnimation";
 // import { StartAudioCall } from "../../redux/slices/audioCall";
 // import { StartVideoCall } from "../../redux/slices/videoCall";
 
@@ -160,7 +161,7 @@ const ChatHeader = () => {
               </Typography>
 
               <Typography variant="caption">
-                {isFriendTyping ? "typing...." : online ? "Online" : "Offline"}
+                {isFriendTyping ? <MessengerTypingAnimation/> : online ? "Online" : "Offline"}
               </Typography>
             </Stack>
           </Stack>

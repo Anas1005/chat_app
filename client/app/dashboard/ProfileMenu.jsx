@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import React from "react";
 import { Avatar, Box, Fade, Menu, MenuItem, Stack } from "@mui/material";
 import { useRouter } from "next/navigation";
@@ -7,15 +7,16 @@ import { faker } from "@faker-js/faker";
 import { Profile_Menu } from "@/data";
 import { useDispatch, useSelector } from "react-redux";
 import { LogoutUser } from "@/redux/slices/authSlice";
-import { socket , disconnectSocket} from "@/socket";
+import { SelectConversation } from "@/redux/slices/appSlice";
+import { socket, disconnectSocket } from "@/socket";
 // import { LogoutUser } from "../../redux/slices/auth";
 // import { socket } from "../../socket";
 // import { useNavigate } from "react-router-dom";
 // import { AWS_S3_REGION, S3_BUCKET_NAME } from "../../config";
 
 const ProfileMenu = () => {
-//   const {user} = useSelector((state) => state.app);
-//   const navigate = useNavigate();
+  //   const {user} = useSelector((state) => state.app);
+  //   const navigate = useNavigate();
   const router = useRouter();
   const dispatch = useDispatch();
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -27,11 +28,12 @@ const ProfileMenu = () => {
     setAnchorEl(null);
   };
 
-//   const user_id = window.localStorage.getItem("user_id");
-     const {user_id} = useSelector((state)=>state.auth);
+  //   const user_id = window.localStorage.getItem("user_id");
 
-//   const user_name = user?.firstName;
-//   const user_img = `https://${S3_BUCKET_NAME}.s3.${AWS_S3_REGION}.amazonaws.com/${user?.avatar}`;
+  const { user_id } = useSelector((state) => state.auth);
+
+  //   const user_name = user?.firstName;
+  //   const user_img = `https://${S3_BUCKET_NAME}.s3.${AWS_S3_REGION}.amazonaws.com/${user?.avatar}`;
 
   return (
     <>
@@ -69,18 +71,14 @@ const ProfileMenu = () => {
               <MenuItem onClick={handleClose} key={idx}>
                 <Stack
                   onClick={() => {
-                    if(idx === 0) {
+                    if (idx === 0) {
                       router.push("/dashboard/settings/profile");
-                    }
-                    else if(idx === 1) {
+                    } else if (idx === 1) {
                       router.push("/dashboard/settings");
-                    }
-                    else {
+                    } else {
+                      dispatch(SelectConversation({ room_id: null }));
                       dispatch(LogoutUser());
                       disconnectSocket(user_id);
-                      
-                      
-                      
                     }
                   }}
                   sx={{ width: 100 }}
