@@ -16,12 +16,12 @@ import {
   FetchUsers,
   FetchFriends,
   FetchFriendRequests,
-} from "@/redux/slices/appSlice";
-import {
   SetOnlineUsers,
   UserOnline,
   UserOffline,
+  SetTypingUsers,
 } from "@/redux/slices/appSlice";
+
 import { socket } from "@/socket";
 // import { io } from 'socket.io-client';
 import toast from "react-hot-toast";
@@ -166,16 +166,30 @@ export const SocketProvider = ({ children }) => {
       }
     });
 
+    socket?.on("user_started_typing",(data)=>{
+      console.log("User Stated Typing",data.user_id)
+      dispatch(SetTypingUsers({user_id:data.user_id}))
+
+    })
+    socket?.on("user_stopped_typing",(data)=>{
+      console.log("User StoppedTyping",data.user_id)
+      dispatch(SetTypingUsers({user_id:data.user_id}))
+
+    })
+
     return () => {
       socket?.off("get_online_users");
       socket?.off("user_online");
       socket?.off("usr_joined_room");
       socket?.off("user_offline");
+      socket?.off("user_started_typing");
+      socket?.off("user_stopped_typing");
       socket?.off("request_sent");
       socket?.off("new_friend_request");
       socket?.off("request_accepted");
       socket?.off("start_chat");
       socket?.off("new_message");
+      
     };
   }, [
     socket,
@@ -252,14 +266,14 @@ export const SocketProvider = ({ children }) => {
     socket?.emit("send_message", message);
   };
 
-  //   useEffect(() => {
-  //     // Cleanup socket on component unmount
-  //     return () => {
-  //       if (socket) {
-  //         socket.disconnect();
-  //       }
-  //     };
-  //   }, [socket]);
+  const startTyping = async(data)=>{
+    socket?.emit("start_typing",data)
+  }
+  const stopTyping = async(data)=>{
+    socket?.emit("stop_typing",data)
+  }
+
+
 
   const value = {
     loading,
@@ -271,6 +285,8 @@ export const SocketProvider = ({ children }) => {
     joinChatRoom,
     getCurrentMessages,
     sendMessage,
+    startTyping,
+    stopTyping
     // socket,
     // initializeSocket,
     // disconnectSocket

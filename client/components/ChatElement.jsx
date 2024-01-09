@@ -61,7 +61,7 @@ const ChatElement = ({
   pinned,
 }) => {
   const dispatch = useDispatch();
-  const { room_id, onlineUsers } = useSelector((state) => state.app);
+  const { room_id, onlineUsers, typingUsers } = useSelector((state) => state.app);
   const iconStyle = {
     fontSize: "1.2rem", // Adjust the size as needed
     color: status === "Seen" ? "#04e813" : "#f2f3f2", // Adjust the colors as needed
@@ -70,7 +70,7 @@ const ChatElement = ({
   const selectedChatId = room_id?.toString();
 
   let online = onlineUsers?.includes(user_id);
-
+  let isFriendTyping = typingUsers?.includes(user_id);
   let isSelected = selectedChatId === id;
 
   //   if (!selectedChatId) {
@@ -162,7 +162,10 @@ const ChatElement = ({
               {name}
             </Typography>
 
-            {outgoing ? (
+            {
+              isFriendTyping ? "typing...":
+              
+              outgoing ? (
               <Box display="flex" alignItems="center" columnGap="4px">
                 {status === "Sent" && <IoCheckmark style={iconStyle} />}{" "}
                 {/* Tick */}
@@ -186,7 +189,12 @@ const ChatElement = ({
               <Typography variant="caption" color="#c5c5c5" fontSize="0.825rem">
                 {truncateText(msg, 20)}
               </Typography>
-            )}
+            )
+            
+            
+            }
+
+
           </Stack>
         </Stack>
         <Stack spacing={2} alignItems={"center"}>

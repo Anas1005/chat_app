@@ -76,10 +76,11 @@ const ChatHeader = () => {
     (state) => state.conversation.direct_chat
   );
 
-  const {onlineUsers} = useSelector((state) => state.app);
-  console.log("In Chat Header",onlineUsers)
+  const { onlineUsers, typingUsers } = useSelector((state) => state.app);
+  console.log("In Chat Header", onlineUsers, typingUsers);
 
   let online = onlineUsers?.includes(current_conversation?.user_id);
+  let isFriendTyping = typingUsers?.includes(current_conversation?.user_id);
 
   //   const [conversationMenuAnchorEl, setConversationMenuAnchorEl] =
   //     React.useState(null);
@@ -159,10 +160,7 @@ const ChatHeader = () => {
               </Typography>
 
               <Typography variant="caption">
-
-                {
-                  online ? "Online":"Offline"
-                }
+                {isFriendTyping ? "typing...." : online ? "Online" : "Offline"}
               </Typography>
             </Stack>
           </Stack>

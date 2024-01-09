@@ -24,6 +24,7 @@ const initialState = {
   chat_type: null,
   room_id: null,
   onlineUsers: [],
+  typingUsers: [],
   // call_logs: [],
 
   tab: 0,
@@ -66,7 +67,7 @@ const appSlice = createSlice({
       state.friendRequests = action.payload.requests;
     },
     setNotifications(state, action) {
-      console.log("In Reducer",action.payload.notifications)
+      console.log("In Reducer", action.payload.notifications);
       state.notification.notifications = action.payload.notifications;
       state.notification.unreadCount = action.payload.notifications.filter(
         (notification) => !notification.read
@@ -74,7 +75,7 @@ const appSlice = createSlice({
     },
 
     markNotificationAsRead(state, action) {
-      const notificationId  = action.payload.notificationId;
+      const notificationId = action.payload.notificationId;
 
       // Find the index of the notification in the state by its ID
       const notificationIndex = state.notification.notifications.findIndex(
@@ -109,8 +110,8 @@ const appSlice = createSlice({
         );
 
       // If the removed notification was unread, decrement the unread count
-      
-      console.log("Read",removedNotification)
+
+      console.log("Read", removedNotification);
       if (removedNotification && !removedNotification.read) {
         state.notification.unreadCount -= 1;
       }
@@ -135,6 +136,21 @@ const appSlice = createSlice({
           (userId) => userId !== action.payload.user_id
         ),
       };
+    },
+
+    setTypingUsers: (state, action) => {
+      const user_id = action.payload.user_id;
+
+      // Check if the user_id is already present in typingUsers
+      const isUserTyping = state.typingUsers.includes(user_id);
+
+      if (isUserTyping) {
+        // If user_id is already present, remove it
+        state.typingUsers = state.typingUsers.filter((id) => id !== user_id);
+      } else {
+        // If user_id is not present, add it
+        state.typingUsers.push(user_id);
+      }
     },
   },
 });
@@ -250,7 +266,7 @@ export function FetchFriendRequests() {
 }
 
 export function SetNotifications({ notifications }) {
-  console.log("In Thunk",notifications)
+  console.log("In Thunk", notifications);
   return async (dispatch, getState) => {
     dispatch(
       appSlice.actions.setNotifications({
@@ -264,15 +280,19 @@ export function MarkNotificationAsRead({ notificationId }) {
     try {
       // Make the API call to mark the notification as read with notificationId in the request body
       dispatch(appSlice.actions.markNotificationAsRead({ notificationId }));
-      const response= await apiConnector('POST', '/user/mark-notification-as-read', { notificationId }, {
-        Authorization: `Bearer ${getState().auth.token}`,
-      });
+      const response = await apiConnector(
+        "POST",
+        "/user/mark-notification-as-read",
+        { notificationId },
+        {
+          Authorization: `Bearer ${getState().auth.token}`,
+        }
+      );
 
       // Dispatch the action to update the state
-     
     } catch (error) {
       // Handle the error, maybe dispatch an error action or log it
-      console.error('Error marking notification as read:', error.message);
+      console.error("Error marking notification as read:", error.message);
     }
   };
 }
@@ -282,15 +302,19 @@ export function RemoveNotification({ notificationId }) {
     try {
       // Make the API call to remove the notification with notificationId in the request body
       dispatch(appSlice.actions.removeNotification({ notificationId }));
-      await apiConnector('POST', '/user/remove-notification', { notificationId }, {
-        Authorization: `Bearer ${getState().auth.token}`,
-      });
+      await apiConnector(
+        "POST",
+        "/user/remove-notification",
+        { notificationId },
+        {
+          Authorization: `Bearer ${getState().auth.token}`,
+        }
+      );
 
       // Dispatch the action to update the state
-    
     } catch (error) {
       // Handle the error, maybe dispatch an error action or log it
-      console.error('Error removing notification:', error.message);
+      console.error("Error removing notification:", error.message);
     }
   };
 }
@@ -320,3 +344,16 @@ export const UserOffline = ({ user_id }) => {
     dispatch(appSlice.actions.userOffline({ user_id }));
   };
 };
+
+export const SetTypingUsers = ({ user_id }) => {
+  return async (dispatch, getState) => {
+    dispatch(appSlice.actions.setTypingUsers({ user_id }));
+  };
+};
+
+// export const UpdateTypingUsers = ({ user_id }) => {
+//   console.log("In UserOnnline Thunk......");
+//   return async (dispatch, getState) => {
+//     dispatch(appSlice.actions.updateTypingUsers({ user_id }));
+//   };
+// };

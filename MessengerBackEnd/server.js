@@ -401,6 +401,21 @@ io.on("connection", async (socket) => {
     io.to(to_user?.socket_id).emit("user_joined_room", userStatusUpdate);
   });
 
+  socket.on("start_typing",async(data)=>{
+    console.log("Start Tyoing....")
+    const to = await User.findById(data.to).select("socket_id");
+    console.log("Start Typing....")
+    io.to(to?.socket_id).emit("user_started_typing",{user_id:data.from});
+  })
+  socket.on("stop_typing",async(data)=>{
+    console.log("Stop Tyoing....")
+    const to = await User.findById(data.to).select("socket_id");
+    console.log("Stop Typing....")
+    io.to(to?.socket_id).emit("user_stopped_typing",{user_id:data.from});
+  })
+
+
+
   socket.on("end", async (data) => {
     try {
       // Find user by ID and set status as offline

@@ -94,6 +94,11 @@ const ChatInput = ({
   setSubtype,
 }) => {
   const [openActions, setOpenActions] = React.useState(false);
+  const { user_id } = useSelector((state) => state.auth);
+  const { current_conversation } = useSelector(
+    (state) => state.conversation.direct_chat
+  );
+  const {startTyping, stopTyping} = useContext(SocketContext);
 
   return (
     <StyledInput
@@ -105,6 +110,14 @@ const ChatInput = ({
       fullWidth
       placeholder="Write a message..."
       variant="filled"
+      onFocus={() => {
+        console.log("Focussed....")
+        startTyping({from:user_id,to:current_conversation?.user_id});  // Call the start typing handler
+      }}
+      onBlur={() => {
+        console.log("Blurred....")
+        stopTyping({from:user_id,to:current_conversation?.user_id});  // Call the stop typing handler
+      }}
       InputProps={{
         disableUnderline: true,
         startAdornment: (
