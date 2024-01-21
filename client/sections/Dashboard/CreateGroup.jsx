@@ -1,6 +1,6 @@
 'use client'
 
-import React from "react";
+import React, { useEffect } from "react";
 import * as Yup from "yup";
 import {
   Button,
@@ -14,6 +14,8 @@ import {
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import { FormProvider, RHFTextField, RHFAutoComplete} from "@/components/hook-form";
+import { useDispatch, useSelector } from "react-redux";
+import { FetchFriends } from "@/redux/slices/appSlice";
 
 
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -37,6 +39,16 @@ const TAGS_OPTION = [
 ];
 
 const CreateGroupForm = ({ handleClose }) => {
+  const dispatch = useDispatch();
+
+  const { friends } = useSelector((state) => state.app);
+
+  useEffect(() => {
+    dispatch(FetchFriends());
+  }, []);
+
+
+
   const NewGroupSchema = Yup.object().shape({
     title: Yup.string().required("Title is required"),
 
@@ -46,7 +58,7 @@ const CreateGroupForm = ({ handleClose }) => {
   const defaultValues = {
     title: "",
 
-    tags: [],
+    members: [],
   };
 
   const methods = useForm({
@@ -80,7 +92,7 @@ const CreateGroupForm = ({ handleClose }) => {
           label="Members"
           multiple
           freeSolo
-          options={TAGS_OPTION.map((option) => option)}
+          options={friends?.map((friend) => `${friend?.firstName} ${friend.lastName}`)}
           ChipProps={{ size: "medium" }}
         />
         <Stack
