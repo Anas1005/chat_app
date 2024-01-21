@@ -1,55 +1,20 @@
 # Chat App Project
 
-This project is a real-time chat application developed using NextJS, Express, MongoDB, MUI, and Socket.io. It provides features like authentication using JWT, real-time chatting, online/offline status, real-time seen status, notifications, and more.
+This project is a real-time chat application built using NextJS, Express, MongoDB, MUI, and Socket.io. It supports features like authentication using JWT, real-time chatting, real-time online/offline status, real-time seen status, real-time notifications, and more.
 
 ## Installation
 
-To run the application locally, follow these steps:
+To run the app locally:
 
-1. Clone the repository:
+1. Clone the repository.
+2. Install dependencies using `npm install`.
+3. Start the application using `npm run dev`.
 
-```bash
-git clone <repository-url>
-Navigate to the project directory:
-bash
-Copy code
-cd chat-app-project
-Install dependencies:
-bash
-Copy code
-npm install
-Start the development server:
-bash
-Copy code
-npm run dev
-The application will be accessible at http://localhost:3000.
+## Usage
 
-Features
-Authentication: Uses JWT for user authentication.
-Real-time Chatting: Enables users to chat in real-time.
-Online/Offline Status: Displays users' online/offline status in real-time.
-Real-time Seen Status: Updates the seen status of messages in real-time.
-Notifications: Sends real-time notifications for new messages.
-Usage
-The application functions as a typical messaging app. Users can send/receive messages, see online/offline statuses, receive notifications, and more.
+The application handles authentication using JWT. Users can send real-time messages, see online/offline status, receive notifications, and more. The project is under active development and open to contributions.
 
-Contributions
-Contributions to the project are welcome. If you have any ideas or improvements, feel free to open an issue or create a pull request.
+## Contributing
 
-How to Contribute
-Fork the repository.
-Create a new branch: git checkout -b feature/your-feature.
-Commit your changes: git commit -m 'Add some feature'.
-Push to the branch: git push origin feature/your-feature.
-Open a pull request.
-License
-This project is licensed under the MIT License.
-
-javascript
-Copy code
-
-Feel free to replace `<repository-url>` with the actual URL of your repository.
-
-
-
+Feel free to contribute to the project. If you find any issues or want to add new features, create a pull request. Your contributions are welcome.
 
