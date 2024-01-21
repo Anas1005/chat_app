@@ -1,4 +1,4 @@
-# Chat App Project
+# Tawk Chat App
 
 This project is a real-time chat application built using NextJS, Express, MongoDB, MUI, and Socket.io. It supports features like authentication using JWT, real-time chatting, real-time online/offline status, real-time seen status, real-time notifications, and more.
 
