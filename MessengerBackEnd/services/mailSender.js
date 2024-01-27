@@ -19,7 +19,7 @@ const mailSender=async(email,title,body)=>{
 
         // Sending the Mail....
         let info = await transporter.sendMail({
-            from:"Study Notion || OTP Verification",
+            from:" Tawk || OTP Verification",
             to:`${email}`,
             subject:`${title}`,
             html:`${body}`

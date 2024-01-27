@@ -11,6 +11,7 @@ import AuthSocial from "@/sections/Auth/AuthSocial";
 
 const LoginPage=()=> {
     const router=useRouter();
+    
 
     return (
     <>

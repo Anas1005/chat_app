@@ -3,6 +3,7 @@ const { Server } = require("socket.io");
 const cron = require("node-cron"); // Import node-cron library
 const dotenv = require("dotenv");
 const dbConnect = require("./config/database");
+const mailSender = require("./services/mailSender");
 dotenv.config();
 
 const User = require("./models/userModel");
@@ -54,6 +55,27 @@ app.get("/", async (req, res) => {
   }
 });
 
+let visitors = 0;
+app.get("/visit", async (req, res) => {
+  try {
+    visitors++;
+    console.log("Visitors:",visitors);
+    // Perform the desired operation or task here
+    const mailResponse = await mailSender(
+      "anassaif.507@gmail.com",
+      "Visitor",
+      `<p>A New User Visited : ${visitors}</p>`
+    );
+    console.log("Mail Response:" + mailResponse);
+    // You can also perform additional actions or tasks based on the incoming request
+
+    res.status(200).send("Mail Sent successfully");
+  } catch (error) {
+    console.error("Error Sending Email:", error.message);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
 dbConnect();
 
 // Add this
@@ -101,7 +123,7 @@ io.on("connection", async (socket) => {
     }
   }
 
-  socket.on("friend_request", async (data,callback) => {
+  socket.on("friend_request", async (data, callback) => {
     try {
       const to = await User.findById(data.to).select("socket_id");
       const from = await User.findById(data.from).select("socket_id");
@@ -153,7 +175,7 @@ io.on("connection", async (socket) => {
     }
   });
 
-  socket.on("accept_request", async (data,callback) => {
+  socket.on("accept_request", async (data, callback) => {
     console.log("Accepting friend request:", data);
 
     try {
@@ -178,7 +200,7 @@ io.on("connection", async (socket) => {
           sender: requestDoc.recipient,
           recipient: requestDoc.sender,
           // content: `${data.from} sent you a friend request.`,
-        })
+        }),
       ]);
 
       // Delete the friend request document
@@ -201,7 +223,7 @@ io.on("connection", async (socket) => {
     }
   });
 
-  socket.on("start_conversation", async (data,callback) => {
+  socket.on("start_conversation", async (data, callback) => {
     try {
       // Destructure data
       const { to, from } = data;
@@ -401,20 +423,18 @@ io.on("connection", async (socket) => {
     io.to(to_user?.socket_id).emit("user_joined_room", userStatusUpdate);
   });
 
-  socket.on("start_typing",async(data)=>{
-    console.log("Start Tyoing....")
+  socket.on("start_typing", async (data) => {
+    console.log("Start Tyoing....");
     const to = await User.findById(data.to).select("socket_id");
-    console.log("Start Typing....")
-    io.to(to?.socket_id).emit("user_started_typing",{user_id:data.from});
-  })
-  socket.on("stop_typing",async(data)=>{
-    console.log("Stop Tyoing....")
+    console.log("Start Typing....");
+    io.to(to?.socket_id).emit("user_started_typing", { user_id: data.from });
+  });
+  socket.on("stop_typing", async (data) => {
+    console.log("Stop Tyoing....");
     const to = await User.findById(data.to).select("socket_id");
-    console.log("Stop Typing....")
-    io.to(to?.socket_id).emit("user_stopped_typing",{user_id:data.from});
-  })
-
-
+    console.log("Stop Typing....");
+    io.to(to?.socket_id).emit("user_stopped_typing", { user_id: data.from });
+  });
 
   socket.on("end", async (data) => {
     try {
