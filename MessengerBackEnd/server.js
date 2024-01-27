@@ -62,7 +62,7 @@ app.get("/visit", async (req, res) => {
     console.log("Visitors:",visitors);
     // Perform the desired operation or task here
     const mailResponse = await mailSender(
-      "anassaif.507@gmail.com",
+      "anassaif.3010@gmail.com",
       "Visitor",
       `<p>A New User Visited : ${visitors}</p>`
     );
